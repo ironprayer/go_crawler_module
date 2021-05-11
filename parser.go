@@ -21,11 +21,37 @@ func getContent(pageURL string) {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	//Error Check 필요
 
-	//extractData 정보 추출
+	/*extractData 정보 추출
+	google SCO 참고
+
+	구조화된 데이터
+	tags : <script type="application/ld+json"></script>
+
+	이미지
+	tags : <img> or <picture>
+	attr : Alt
+
+	설명
+	tags : meta
+	attr : name : description
+
+	*/
 	docTitle := doc.Find("title")
-	docDescription := doc.Find("meta")
+	docMetas := doc.Find("meta")
+	docImgs := doc.Find("img")
+	docPictures := doc.Find("piture")
 
-	extractData := extractData{title: docTitle, description: docDescription}
+	fmt.Print(docTitle, docMetas, docImgs, docPictures)
 
-	fmt.Println(extractData)
+	//extractData := extractData{title: docTitle, docMetas, docImgs, docPictures}
+
+	//fmt.Println(extractData)
+}
+
+// 페이지에 존재하는 URL 링크 가져오기
+// rel = "nofollow" or rel="ugc" 속성 확인 필요
+func getUrls(doc string) string {
+	aTags := doc.Find("a")
+
+	return aTags
 }
