@@ -3,6 +3,8 @@ package parser
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 type extractData struct {
@@ -11,10 +13,11 @@ type extractData struct {
 	//데이터 정의 및 추가해야 함
 }
 
-func getContent(pageURL string) {
+func GetContent(pageURL string) {
 	fmt.Println("Requesting", pageURL)
 	res, err := http.Get(pageURL)
 	//Error Check 필요
+	fmt.Println(err)
 
 	defer res.Body.Close()
 
@@ -40,8 +43,22 @@ func getContent(pageURL string) {
 	docMetas := doc.Find("meta")
 	docImgs := doc.Find("img")
 	docPictures := doc.Find("piture")
+	docATags := doc.Find("a")
 
-	fmt.Print(docTitle, docMetas, docImgs, docPictures)
+	fmt.Println(docTitle)
+	fmt.Println((*docTitle).Text())
+
+	fmt.Println(docMetas.Text())
+	fmt.Println("Atags", docATags.Length())
+
+	/* 빈 공백만 출력됨
+	docMetas.Each(func(i int, meta *goquery.Selection) {
+		fmt.Println(meta.Text())
+	})
+	*/
+	fmt.Println(docMetas)
+
+	fmt.Println(docTitle.Length(), docMetas.Length(), docImgs.Length(), docPictures.Length())
 
 	//extractData := extractData{title: docTitle, docMetas, docImgs, docPictures}
 
@@ -50,8 +67,10 @@ func getContent(pageURL string) {
 
 // 페이지에 존재하는 URL 링크 가져오기
 // rel = "nofollow" or rel="ugc" 속성 확인 필요
+/*
 func getUrls(doc string) string {
 	aTags := doc.Find("a")
 
 	return aTags
 }
+*/
