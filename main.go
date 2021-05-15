@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
-	url := "https://www.pinterest.co.kr/"
+	//url := "https://www.pinterest.co.kr/"
+	url := "https://home.kepco.co.kr/kepco/main.do"
 	parser.GetContent(url)
 }
