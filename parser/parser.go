@@ -19,7 +19,6 @@ type extractData struct {
 // 크롤러라는 게 일정주기로 다시 전체 사이트 접속해봐야겠지. (사이트 꺼졌다던가, 뭐했다던가, 벤 당한건) reuqests 보내는 시간을 조정해줘야됨
 // 주기 정하는 것
 
-/*
 func GetDocument(pageURL string) (*goquery.Document, error) {
 	res, err := http.Get(pageURL)
 	if err != nil {
@@ -32,7 +31,6 @@ func GetDocument(pageURL string) (*goquery.Document, error) {
 
 	return doc, err
 }
-*/
 
 func GetContent(pageURL string) {
 	fmt.Println("Requesting", pageURL)
@@ -68,41 +66,8 @@ func GetContent(pageURL string) {
 	attr : name : description
 
 	*/
-	docTitle := doc.Find("title")
+
 	docMetas := doc.Find("meta")
-	//개수가 많다. Url : img, pic, a    1 : n => 어떤식으로 데이터를 떨궈줘야 할지 /
-	//img1 : 원천 데이터
-	docImgs := doc.Find("img")
-	docPictures := doc.Find("picture")
-	//docATags := doc.Find("a")
-
-	fmt.Println(docTitle.Text())
-	fmt.Println(docMetas.Length())
-	//fmt.Println(docMetas.Attr("name"))
-	//fmt.Println((*docMetas).Attr("name"))
-
-	/*
-		docMetas.Each(func(i int, meta *goquery.Selection) {
-			fmt.Println(meta.Attr("name")) //meta 전체 이름 출력
-			if name, _ := meta.Attr("name"); name == "description" {
-				description, _ := meta.Attr("content")
-				fmt.Printf("Doc Description: %s\n", description)
-			}
-		})
-	*/
-	/*
-		docImgs.Each(func(i int, img *goquery.Selection) {
-			fmt.Println(img.Attr("alt"))
-		})
-	*/
-
-	/*
-		fmt.Printf("A Link Count : %d\n", docATags.Length())
-		docATags.Each(func(i int, tag *goquery.Selection) {
-			link, _ := tag.Attr("href")
-			fmt.Printf("No%d : %s\n", i, link)
-		})
-	*/
 
 	doc.Find("script").Each(func(i int, script *goquery.Selection) {
 		scriptType, _ := script.Attr("type")
@@ -111,19 +76,65 @@ func GetContent(pageURL string) {
 		}
 	})
 
-	fmt.Println(docTitle.Length(), docMetas.Length(), docImgs.Length(), docPictures.Length())
-
+	fmt.Print(docMetas)
 	//extractData := extractData{title: docTitle, docMetas, docImgs, docPictures}
 
 	//fmt.Println(extractData)
 }
 
+func getTitleInDocument(doc *goquery.Document) string {
+	docTitle := doc.Find("title")
+	return docTitle.Text()
+}
+
+func getDescriptionInDocument(doc *goquery.Document) string {
+	docMetas := doc.Find("meta")
+	var description string
+
+	docMetas.Each(func(i int, meta *goquery.Selection) {
+		if name, _ := meta.Attr("name"); name == "description" {
+			description, _ = meta.Attr("content")
+		}
+	})
+
+	return description
+}
+
+type imgInfo struct {
+	url         string
+	description string
+}
+
+func getImgDatasInDocument(doc *goquery.Document) []imgInfo {
+	var imgInfos []imgInfo
+	docImgs := doc.Find("img")
+	docPicture := doc.Find("picture")
+
+	docImgs.Each(func(i int, img *goquery.Selection) {
+		urlOfImg, _ := img.Attr("src")
+		altOfImg, _ := img.Attr("alt")
+		imgInfos = append(imgInfos, imgInfo{urlOfImg, altOfImg})
+	})
+
+	docPicture.Each(func(i int, pic *goquery.Selection) {
+		urlOfImg, _ := pic.Attr("src")
+		altOfImg, _ := pic.Attr("alt")
+		imgInfos = append(imgInfos, imgInfo{urlOfImg, altOfImg})
+	})
+
+	return imgInfos
+}
+
 // 페이지에 존재하는 URL 링크 가져오기
 // rel = "nofollow" or rel="ugc" 속성 확인 필요
-/*
-func getUrls(doc string) string {
-	aTags := doc.Find("a")
+func getUrls(doc *goquery.Document) []string {
+	var aTags []string
+	docATags := doc.Find("a")
+
+	docATags.Each(func(i int, tag *goquery.Selection) {
+		link, _ := tag.Attr("href")
+		aTags = append(aTags, link)
+	})
 
 	return aTags
 }
-*/
