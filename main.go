@@ -6,6 +6,10 @@ import (
 
 func main() {
 	//url := "https://www.pinterest.co.kr/"
-	url := "https://home.kepco.co.kr/kepco/main.do"
-	parser.GetContent(url)
+	//url := "https://home.kepco.co.kr/kepco/main.do"
+	imgURL := "/12.png/test"
+	baseURL := "https://naver.com/"
+	//parser.GetContent(url)
+	parser.GetCleansingURL(baseURL, imgURL)
+
 }

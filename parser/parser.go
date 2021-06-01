@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -25,9 +26,16 @@ type ImgInfo struct {
 // 크롤러라는 게 일정주기로 다시 전체 사이트 접속해봐야겠지. (사이트 꺼졌다던가, 뭐했다던가, 벤 당한건) reuqests 보내는 시간을 조정해줘야됨
 // 주기 정하는 것
 
-func GetContent(html string) {
+func GetContent(pageURL string) {
+	fmt.Println("Requesting", pageURL)
+	res, err := http.Get(pageURL)
+	//Error Check 필요
+	fmt.Println(err)
+	defer res.Body.Close()
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+
 	fmt.Println("Parser Start...")
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	//doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 
 	if err != nil {
 		log.Fatal(err)
@@ -35,10 +43,10 @@ func GetContent(html string) {
 
 	title := getTitleInDocument(doc)
 	description := getDescriptionInDocument(doc)
-	imgInfos := getImgDatasInDocument(doc)
-	links := getURLsInDocument(doc)
+	//imgInfos := getImgDatasInDocument(doc)
+	links := getURLsInDocument(doc, pageURL)
 
-	fmt.Println(title, description, imgInfos, links)
+	fmt.Println(title, description, links)
 
 }
 
@@ -82,13 +90,14 @@ func getImgDatasInDocument(doc *goquery.Document) []ImgInfo {
 }
 
 // rel = "nofollow" or rel="ugc" 속성 확인 필요
-func getURLsInDocument(doc *goquery.Document) []string {
+func getURLsInDocument(doc *goquery.Document, baseURL string) []string {
 	var URLs []string
 	docATags := doc.Find("a")
 
 	docATags.Each(func(i int, tag *goquery.Selection) {
 		tempLink, _ := tag.Attr("href")
-		link := getCleansingURL(tempLink)
+		link := GetCleansingURL(baseURL, tempLink)
+		fmt.Println(link)
 
 		if link != "" {
 			URLs = append(URLs, link)
@@ -98,14 +107,39 @@ func getURLsInDocument(doc *goquery.Document) []string {
 	return URLs
 }
 
+func isValidURL(url string) bool {
+	//조건은 검색해보면서 더 추가해야겠네.
+	urlSplitWords := strings.Split(url, "/")
+	urlSplitWordCnt := len(urlSplitWords)
+
+	if urlSplitWordCnt < 1 {
+		return false
+	}
+
+	return true
+}
+
 /*
 *	작성 필요
 *	Case 1 : URL 형식이 아닌 문자열 삭제 (예 : void(0))
 *	Case 2 : 기본 URL이 없는 문자열 정제 (예 : /img/example.png) => (base_url)http://demo.samplePage + (extract_url)/img/example.png
 *	Case 3 : 정상적인 URL 문자열 (예 : http://demo.samplePage/img/example.png)
  */
-func getCleansingURL(url string) string {
-	return url
+func GetCleansingURL(baseURL string, url string) string {
+	cleansingURL := url
+
+	// 먼저 URL이 유효한지부터 확인을 해야겠구나.
+	if strings.Contains(url, "http") == false {
+		stringSplit := strings.Split(url, "/")
+		if len(stringSplit) > 1 {
+			stringSplit = stringSplit[1:]
+			listJoinString := strings.Join(stringSplit, "/")
+			fmt.Println(listJoinString)
+			cleansingURL = baseURL + url
+		}
+	}
+
+	return cleansingURL
 }
 
 /*
