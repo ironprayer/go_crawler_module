@@ -1,9 +1,11 @@
 package parser
 
 import (
+	"encoding/csv"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -45,6 +47,7 @@ func GetContent(pageURL string) {
 	description := getDescriptionInDocument(doc)
 	//imgInfos := getImgDatasInDocument(doc)
 	links := getURLsInDocument(doc, pageURL)
+	writeLinkInFile(links)
 
 	fmt.Println(title, description, links)
 
@@ -68,25 +71,31 @@ func getDescriptionInDocument(doc *goquery.Document) string {
 	return description
 }
 
+// img 태그와 picture 태그를 각자 다룰지 아니면 한 번에 다룰지 각 태그의 속성을 확인을 해봐야겠다.
 func getImgDatasInDocument(doc *goquery.Document) []ImgInfo {
 	var imgInfos []ImgInfo
 	docImgs := doc.Find("img")
-	docPicture := doc.Find("picture")
 
-	// 함수로 만들어서 1개로 줄일 거 생각해야 함.
 	docImgs.Each(func(i int, img *goquery.Selection) {
 		urlOfImg, _ := img.Attr("src")
 		altOfImg, _ := img.Attr("alt")
 		imgInfos = append(imgInfos, ImgInfo{urlOfImg, altOfImg})
 	})
 
+	return imgInfos
+}
+
+func getPicDatasInDocument(doc *goquery.Document) []ImgInfo {
+	var picInfos []ImgInfo
+	docPicture := doc.Find("picture")
+
 	docPicture.Each(func(i int, pic *goquery.Selection) {
 		urlOfImg, _ := pic.Attr("src")
 		altOfImg, _ := pic.Attr("alt")
-		imgInfos = append(imgInfos, ImgInfo{urlOfImg, altOfImg})
+		picInfos = append(picInfos, ImgInfo{urlOfImg, altOfImg})
 	})
 
-	return imgInfos
+	return picInfos
 }
 
 // rel = "nofollow" or rel="ugc" 속성 확인 필요
@@ -94,12 +103,13 @@ func getURLsInDocument(doc *goquery.Document, baseURL string) []string {
 	var URLs []string
 	docATags := doc.Find("a")
 
+	// URL 중복 제거 기능 필요하겠는데
 	docATags.Each(func(i int, tag *goquery.Selection) {
 		tempLink, _ := tag.Attr("href")
-		link := GetCleansingURL(baseURL, tempLink)
-		fmt.Println(link)
 
-		if link != "" {
+		if isValidURL(tempLink) {
+			link := GetCleansingURL(baseURL, tempLink)
+			fmt.Println(link)
 			URLs = append(URLs, link)
 		}
 	})
@@ -112,11 +122,7 @@ func isValidURL(url string) bool {
 	urlSplitWords := strings.Split(url, "/")
 	urlSplitWordCnt := len(urlSplitWords)
 
-	if urlSplitWordCnt < 1 {
-		return false
-	}
-
-	return true
+	return urlSplitWordCnt > 1
 }
 
 /*
@@ -129,18 +135,36 @@ func GetCleansingURL(baseURL string, url string) string {
 	cleansingURL := url
 
 	// 먼저 URL이 유효한지부터 확인을 해야겠구나.
-	if strings.Contains(url, "http") == false {
-		stringSplit := strings.Split(url, "/")
-		if len(stringSplit) > 1 {
-			stringSplit = stringSplit[1:]
-			listJoinString := strings.Join(stringSplit, "/")
-			fmt.Println(listJoinString)
-			cleansingURL = baseURL + url
-		}
+	if !strings.Contains(url, "http") {
+		cleansingURL = baseURL + url
 	}
 
 	return cleansingURL
 }
+
+func writeLinkInFile(links []string) {
+	file, err := os.Create("links.csv")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//에러 체크 함수 필요
+
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	for _, link := range links {
+		w.Write([]string{link})
+		//에러 체크 함수 필요
+	}
+
+}
+
+/*
+*	함수 작성 필요
+*	논의 사항 - 데이터 입력 때 DB커넥션이 가장 적은 방안 논의 / insert, batch, loader
+ */
+func insertDataInDB() {}
 
 /*
 func getJsonInDocument(doc *goquery.Documnet) string{
