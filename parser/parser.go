@@ -43,13 +43,13 @@ func GetContent(pageURL string) {
 		log.Fatal(err)
 	}
 
-	title := getTitleInDocument(doc)
-	description := getDescriptionInDocument(doc)
-	//imgInfos := getImgDatasInDocument(doc)
+	//title := getTitleInDocument(doc)
+	//description := getDescriptionInDocument(doc)
+	imgInfos := getImgDatasInDocument(doc)
 	links := getURLsInDocument(doc, pageURL)
 	writeLinkInFile(links)
-
-	fmt.Println(title, description, links)
+	writeImgInFile(imgInfos)
+	//fmt.Println(title, description, links)
 
 }
 
@@ -158,6 +158,21 @@ func writeLinkInFile(links []string) {
 		//에러 체크 함수 필요
 	}
 
+}
+
+func writeImgInFile(imgInfos []ImgInfo) {
+	file, err := os.Create("imgInfos.csv")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	w := csv.NewWriter(file)
+	defer w.Flush()
+
+	for _, imgInfo := range imgInfos {
+		w.Write([]string{imgInfo.url, imgInfo.alt})
+	}
 }
 
 /*
