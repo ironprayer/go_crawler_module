@@ -45,7 +45,7 @@ func GetContent(pageURL string) {
 
 	//title := getTitleInDocument(doc)
 	//description := getDescriptionInDocument(doc)
-	imgInfos := getImgDatasInDocument(doc)
+	imgInfos := getImgDatasInDocument(doc, pageURL)
 	links := getURLsInDocument(doc, pageURL)
 	writeLinkInFile(links)
 	writeImgInFile(imgInfos)
@@ -72,14 +72,16 @@ func getDescriptionInDocument(doc *goquery.Document) string {
 }
 
 // img 태그와 picture 태그를 각자 다룰지 아니면 한 번에 다룰지 각 태그의 속성을 확인을 해봐야겠다.
-func getImgDatasInDocument(doc *goquery.Document) []ImgInfo {
+func getImgDatasInDocument(doc *goquery.Document, baseURL string) []ImgInfo {
 	var imgInfos []ImgInfo
 	docImgs := doc.Find("img")
 
 	docImgs.Each(func(i int, img *goquery.Selection) {
 		urlOfImg, _ := img.Attr("src")
 		altOfImg, _ := img.Attr("alt")
-		imgInfos = append(imgInfos, ImgInfo{urlOfImg, altOfImg})
+
+		cleansingURL := GetCleansingURL(urlOfImg, baseURL)
+		imgInfos = append(imgInfos, ImgInfo{cleansingURL, altOfImg})
 	})
 
 	return imgInfos
@@ -178,6 +180,7 @@ func writeImgInFile(imgInfos []ImgInfo) {
 /*
 *	함수 작성 필요
 *	논의 사항 - 데이터 입력 때 DB커넥션이 가장 적은 방안 논의 / insert, batch, loader
+*	mogoDB, postgresql(open source)
  */
 func insertDataInDB() {}
 
