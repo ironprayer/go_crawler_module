@@ -47,6 +47,7 @@ func GetContent(pageURL string) {
 	//description := getDescriptionInDocument(doc)
 	imgInfos := getImgDatasInDocument(doc, pageURL)
 	links := getURLsInDocument(doc, pageURL)
+	getPicDatasInDocument(doc, pageURL)
 	writeLinkInFile(links)
 	writeImgInFile(imgInfos)
 	//fmt.Println(title, description, links)
@@ -87,14 +88,16 @@ func getImgDatasInDocument(doc *goquery.Document, baseURL string) []ImgInfo {
 	return imgInfos
 }
 
-func getPicDatasInDocument(doc *goquery.Document) []ImgInfo {
+func getPicDatasInDocument(doc *goquery.Document, baseURL string) []ImgInfo {
 	var picInfos []ImgInfo
 	docPicture := doc.Find("picture")
 
 	docPicture.Each(func(i int, pic *goquery.Selection) {
 		urlOfImg, _ := pic.Attr("src")
 		altOfImg, _ := pic.Attr("alt")
-		picInfos = append(picInfos, ImgInfo{urlOfImg, altOfImg})
+
+		cleansingURL := GetCleansingURL(urlOfImg, baseURL)
+		picInfos = append(picInfos, ImgInfo{cleansingURL, altOfImg})
 	})
 
 	return picInfos
