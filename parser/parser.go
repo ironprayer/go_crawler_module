@@ -130,6 +130,14 @@ func isValidURL(url string) bool {
 	return urlSplitWordCnt > 1
 }
 
+func IsValidURL(url string) bool {
+	//조건은 검색해보면서 더 추가해야겠네.
+	urlSplitWords := strings.Split(url, "/")
+	urlSplitWordCnt := len(urlSplitWords)
+
+	return urlSplitWordCnt > 1
+}
+
 /*
 *	작성 필요
 *	Case 1 : URL 형식이 아닌 문자열 삭제 (예 : void(0))

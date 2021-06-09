@@ -13,3 +13,13 @@ func TestGetCleansingURL(t *testing.T) {
 	assert.Equal(t, expected, actual, "기대값과 결과값이 다릅니다")
 
 }
+
+func TestIsValidURL(t *testing.T) {
+	actual := parser.IsValidURL("/test.png")
+	expected := true
+	assert.Equal(t, expected, actual, "기대값과 결과값이 다릅니다")
+
+	actual = parser.IsValidURL("void(0)")
+	expected = false
+	assert.Equal(t, expected, actual, "기대값과 결과값이 다릅니다")
+}
