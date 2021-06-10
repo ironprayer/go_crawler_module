@@ -23,3 +23,8 @@ func TestIsValidURL(t *testing.T) {
 	expected = false
 	assert.Equal(t, expected, actual, "기대값과 결과값이 다릅니다")
 }
+
+func TestWriteInFile(t *testing.T) {
+	var testList = []string{"File Write Test", "File Write Test 02", "File Write Test 03"}
+	parser.WriteLinkInFile(testList)
+}

@@ -48,7 +48,7 @@ func GetContent(pageURL string) {
 	imgInfos := getImgDatasInDocument(doc, pageURL)
 	links := getURLsInDocument(doc, pageURL)
 	getPicDatasInDocument(doc, pageURL)
-	writeLinkInFile(links)
+	WriteLinkInFile(links)
 	writeImgInFile(imgInfos)
 	//fmt.Println(title, description, links)
 
@@ -155,7 +155,7 @@ func GetCleansingURL(baseURL string, url string) string {
 	return cleansingURL
 }
 
-func writeLinkInFile(links []string) {
+func WriteLinkInFile(links []string) {
 	file, err := os.Create("links.csv")
 
 	if err != nil {
