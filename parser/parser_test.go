@@ -28,3 +28,9 @@ func TestWriteInFile(t *testing.T) {
 	var testList = []string{"File Write Test", "File Write Test 02", "File Write Test 03"}
 	parser.WriteLinkInFile(testList)
 }
+
+func TestWriteDataInFile(t *testing.T) {
+	//오류 확인 필요
+	var testList = []parser.ImgInfo{parser.ImgInfo{"File Write Test", "test1"}, parser.ImgInfo{"File Write Test 02", "test2"}, parser.ImgInfo{"File Write Test 03", "test3"}}
+	parser.WriteImgInFile(testList)
+}
