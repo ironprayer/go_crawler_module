@@ -29,8 +29,15 @@ func TestWriteInFile(t *testing.T) {
 	parser.WriteLinkInFile(testList)
 }
 
+func TestGetContent(t *testing.T) {
+	url := "https://home.kepco.co.kr/kepco/main.do"
+	parser.GetContent(url)
+}
+
+/*
 func TestWriteDataInFile(t *testing.T) {
 	//오류 확인 필요
 	var testList = []parser.ImgInfo{parser.ImgInfo{"File Write Test", "test1"}, parser.ImgInfo{"File Write Test 02", "test2"}, parser.ImgInfo{"File Write Test 03", "test3"}}
 	parser.WriteImgInFile(testList)
 }
+*/
