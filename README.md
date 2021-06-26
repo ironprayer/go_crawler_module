@@ -9,3 +9,8 @@
 
 #### 참고 사이트
 * 구글 SEO(https://developers.google.com/search/docs/beginner/seo-starter-guide?hl=ko)
+
+2021.06.26 회의
+- Parser, Filter 금주 내에 기능 구현(지현)
+- Frontier, Fecther 금주 내에 기능 구현(주온)
+- 차주에 크롤러 
