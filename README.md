@@ -14,3 +14,7 @@
 - Parser, Filter 금주 내에 기능 구현(지현)
 - Frontier, Fecther 금주 내에 기능 구현(주온)
 - 차주에 크롤러 
+
+2021.07.01 
+- Parser, Filter 전송 소스 짜기
+- Parser 데이터 추출 형식 구상하기
