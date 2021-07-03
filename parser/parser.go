@@ -19,6 +19,12 @@ type extractData struct {
 	//데이터 정의 및 추가해야 함
 }
 
+type Html struct {
+	pageURL  string
+	baseURL  string
+	document string
+}
+
 type ImgInfo struct {
 	url string
 	alt string
@@ -43,6 +49,7 @@ func GetContent(pageURL string) {
 		log.Fatal(err)
 	}
 
+	pageURL = GetBaseURL(pageURL)
 	//title := getTitleInDocument(doc)
 	//description := getDescriptionInDocument(doc)
 	imgInfos := getImgDatasInDocument(doc, pageURL)
@@ -52,6 +59,14 @@ func GetContent(pageURL string) {
 	WriteImgInFile(imgInfos)
 	//fmt.Println(title, description, links)
 
+}
+
+func GetBaseURL(pageURL string) string {
+	//http가 들어갔나
+	pageUnits := strings.Split(pageURL, "/")
+	pageUnits = pageUnits[:3]
+	baseURL := strings.Join(pageUnits, "/")
+	return baseURL
 }
 
 func getTitleInDocument(doc *goquery.Document) string {
@@ -81,7 +96,9 @@ func getImgDatasInDocument(doc *goquery.Document, baseURL string) []ImgInfo {
 		urlOfImg, _ := img.Attr("src")
 		altOfImg, _ := img.Attr("alt")
 
-		cleansingURL := GetCleansingURL(urlOfImg, baseURL)
+		cleansingURL := GetCleansingURL(baseURL, urlOfImg)
+		fmt.Println(urlOfImg)
+		fmt.Println(cleansingURL)
 		imgInfos = append(imgInfos, ImgInfo{cleansingURL, altOfImg})
 	})
 
@@ -96,7 +113,7 @@ func getPicDatasInDocument(doc *goquery.Document, baseURL string) []ImgInfo {
 		urlOfImg, _ := pic.Attr("src")
 		altOfImg, _ := pic.Attr("alt")
 
-		cleansingURL := GetCleansingURL(urlOfImg, baseURL)
+		cleansingURL := GetCleansingURL(baseURL, urlOfImg)
 		picInfos = append(picInfos, ImgInfo{cleansingURL, altOfImg})
 	})
 
@@ -114,7 +131,7 @@ func getURLsInDocument(doc *goquery.Document, baseURL string) []string {
 
 		if isValidURL(tempLink) {
 			link := GetCleansingURL(baseURL, tempLink)
-			fmt.Println(link)
+			//fmt.Print(link)
 			URLs = append(URLs, link)
 		}
 	})
