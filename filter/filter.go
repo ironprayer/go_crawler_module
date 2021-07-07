@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -11,17 +10,23 @@ import (
 
 func removeDuplicateURL(urls []string) {}
 func removeVisitedURL(urls []string)   {}
-func RemoveNotValidURLInRobots(urls []string) {
+func RemoveNotValidURLInRobots(urls []string) []string {
 
 	agent := "*"
+	validURLs := make([]string, 0)
 
 	for _, url := range urls {
 		robotsURL := getRobotsURL(url)
 		targetURL := getTargetURL(url)
 		robotsRule := getRobotsRules(robotsURL)
 		isAllowURL := isAllowURLWithRobots(robotsRule, agent, targetURL)
-		fmt.Println(url, robotsURL, robotsRule, isAllowURL, agent)
+
+		if isAllowURL == true {
+			validURLs = append(validURLs, url)
+		}
+		//fmt.Println(url, robotsURL, robotsRule, isAllowURL, agent)
 	}
+	return validURLs
 }
 
 func getRobotsURL(url string) string {
