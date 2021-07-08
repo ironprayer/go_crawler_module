@@ -8,8 +8,13 @@ import (
 	"github.com/temoto/robotstxt"
 )
 
-func removeDuplicateURL(urls []string) {}
-func removeVisitedURL(urls []string)   {}
+func removeDuplicateURL(urls []string) {
+	// 중복 제거 확인 해야할듯
+
+}
+func removeVisitedURL(urls []string) {
+	// 파일 또는 DB에서 가져와야할 것 같은데
+}
 func RemoveNotValidURLInRobots(urls []string) []string {
 
 	agent := "*"
