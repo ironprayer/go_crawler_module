@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -13,8 +14,21 @@ func removeDuplicateURL(urls []string) {
 
 }
 func removeVisitedURL(urls []string) {
+	vaildURLs := make([]string, 0)
+	for _, url := range urls {
+		isUsed := isUsedURL(url)
+		if isUsed == false {
+			vaildURLs = append(vaildURLs, url)
+		}
+	}
+	fmt.Print(vaildURLs)
 	// 파일 또는 DB에서 가져와야할 것 같은데
 }
+
+func isUsedURL(url string) bool {
+	return true
+}
+
 func RemoveNotValidURLInRobots(urls []string) []string {
 
 	agent := "*"
